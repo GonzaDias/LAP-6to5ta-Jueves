@@ -1,0 +1,68 @@
+package proy.programa;
+
+import javax.swing.*;
+import proy.modelos.*;
+import proy.daos.*;
+import javax.swing.*;
+import proy.modelos.*;
+public class Principal {
+	
+	public static void main(String[] args) {
+		
+		//instanciamos un objeto DAO para poder utilizar los procesos de accesos a la base de datos
+		//PersonaVO p1 = new PersonaVO(nombre, edad, profesion, telefono);
+		PersonaDAO midao = new PersonaDAO();
+		int opcionIng = 0;
+		
+		opcionIng = Integer.parseInt(JOptionPane.showInputDialog(null, "Seleccione una opcion 1-Registrar persona 2-Buscar persona 3-Actualizar Persona"));
+		switch(opcionIng) {
+		
+		case 1://solicitamos los datos al usuario
+			/*
+			String nombre = JOptionPane.showInputDialog("Ingrese el nombre de la persona");
+			int edad = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la edad de la persona"));
+			String profesion = JOptionPane.showInputDialog("Ingrese la profesion de la persona");
+			int telefono = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el telefono de la persona"));
+			//utilizamos el proceso que inserta una persona a la base de datos
+			 	
+			 */
+			midao.registrarPersona(SolicitarDatosPersona(true));
+			break;
+		case 2:
+			//solicitamos los datos al user
+			int idBuscar = Integer.parseInt(JOptionPane.showInputDialog("ingrese el Id de la persona a buscar"));
+			PersonaVO pvo = midao.buscarPersona(idBuscar);
+			if (pvo != null) {
+				System.out.println("La persona existe y es la siguiente");
+				JOptionPane.showMessageDialog(null, pvo.toString());
+			}
+			else {
+				JOptionPane.showMessageDialog(null, "La persona con :" + idBuscar +"no existe");
+			}
+			break;
+		case 3:
+			midao.modificarPersona(SolicitarDatosPersona(false));
+			break;
+		default:
+			System.out.println("La opcion: "+opcionIng+"es Invalida");
+			break;
+		}
+	}
+	
+	public static PersonaVO SolicitarDatosPersona(boolean crearPersona) {
+		
+		String nombre = JOptionPane.showInputDialog("Ingrese el nombre de la persona");
+		Integer edad = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la edad de la persona"));
+		String profesion = JOptionPane.showInputDialog("Ingrese la profesion de la persona");
+		Integer telefono = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el telefono de la persona"));
+		
+		if(!crearPersona) {//solicitamos datos al usuario
+			Integer id = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el ID de la persona"));
+			return new PersonaVO(id, nombre, edad, profesion, telefono);
+		}
+		else {
+			return new PersonaVO(nombre, edad, profesion, telefono);
+		}
+	}
+	
+}
