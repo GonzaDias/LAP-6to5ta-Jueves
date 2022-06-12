@@ -1,82 +1,51 @@
-package proy.modelos;
+package proy.conexionDB;
 
-public class PersonaVO { //VALUE OBJECT Data Transfer Object
-	private int idPersona;
-	private String nombrePersona;
-	private int edadPersona;
-	private String profesionPersona;
-	private int telefonoPersona;
-	private static int cont;
-	
-	public PersonaVO() {
-		//this.idPersona = ++PersonaVO.cont;
-		
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class Conexion {
+
+	// nombre de la base
+	static String db = "baseeduit";
+	// credenciales de la base
+	static String login = "root";
+	static String password = "";
+	static String url = "jdbc:mysql://localhost/" + db; // string de conexion
+
+	Connection conn = null;
+
+	public Conexion() {
+		try {
+			// obtenemos el driver de conexion
+			Class.forName("com.mysql.jdbc.Driver");
+			// obtengo un objeto connection mediante el administrador de conexiones
+			conn = DriverManager.getConnection(url, login, password);
+
+			if (conn != null) {
+				System.out.println("Se logro conectar exitosamente a la base " + db);
+			}
+			
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} catch (ClassNotFoundException e) {
+			System.out.println(e.getMessage());
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
-	public PersonaVO(Integer idPersona, String nombrePersona, int edadPersona, String profesionPersona,
-			int telefonoPersona) {
-		//this();
-		this.idPersona = idPersona;
-		this.nombrePersona = nombrePersona;
-		this.edadPersona = edadPersona;
-		this.profesionPersona = profesionPersona;
-		this.telefonoPersona = telefonoPersona;
+	public Connection getConnection() {
+		return conn;
 	}
-	
-	public PersonaVO(String nombrePersona, int edadPersona, String profesionPersona,
-			int telefonoPersona) {
-		//this();
-		
-		this.nombrePersona = nombrePersona;
-		this.edadPersona = edadPersona;
-		this.profesionPersona = profesionPersona;
-		this.telefonoPersona = telefonoPersona;
-	}
-
-	public int getIdPersona() {
-		return idPersona;
-	}
-
-	public void setIdPersona(int idPersona) {
-		this.idPersona = idPersona;
-	}
-
-	public String getNombrePersona() {
-		return nombrePersona;
-	}
-
-	public void setNombrePersona(String nombrePersona) {
-		this.nombrePersona = nombrePersona;
-	}
-
-	public int getEdadPersona() {
-		return edadPersona;
-	}
-
-	public void setEdadPersona(int edadPersona) {
-		this.edadPersona = edadPersona;
-	}
-
-	public String getProfesionPersona() {
-		return profesionPersona;
-	}
-
-	public void setProfesionPersona(String profesionPersona) {
-		this.profesionPersona = profesionPersona;
-	}
-
-	public int getTelefonoPersona() {
-		return telefonoPersona;
-	}
-
-	public void setTelefonoPersona(int telefonoPersona) {
-		this.telefonoPersona = telefonoPersona;
-	}
-
-	@Override
-	public String toString() {
-		return "PersonaVO [idPersona=" + idPersona + ", nombrePersona=" + nombrePersona + ", edadPersona=" + edadPersona
-				+ ", profesionPersona=" + profesionPersona + ", telefonoPersona=" + telefonoPersona + "]";
+	public void desconectar() {
+		try{
+			conn.close();
+			System.out.println("Se logro desconectar exitosamente");
+		} catch(SQLException e) {
+			System.out.println("No se pudo cerrar la conexion a la DB");
+			e.printStackTrace();
+		}
 	}
 
 }
