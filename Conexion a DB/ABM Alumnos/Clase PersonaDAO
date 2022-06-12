@@ -1,0 +1,111 @@
+package proy.daos;
+
+import java.sql.*;
+import java.util.*;
+import proy.conexionDB.Conexion;
+import proy.modelos.PersonaVO;
+import javax.swing.JOptionPane;
+
+//import com.mysql.jdbc.PreparedStatement;
+
+public class PersonaDAO { //patron DAO Data access object
+
+	public void registrarPersona(PersonaVO mipersona) { //metodo que inserta datos en persona
+		
+		Conexion con = new Conexion();
+		
+		try {
+			Statement estatuto = con.getConnection().createStatement();//se obtiene un estatuto contra la conexion para poder utoilizar y realizar consultas SQL
+			//se ejecuta la query contra la DB
+			estatuto.executeUpdate("INSERT INTO persona (nombre, edad, profesion, telefono) VALUES ('"+mipersona.getNombrePersona()+"','"+mipersona.getEdadPersona()+"', '"+mipersona.getProfesionPersona()+"', '"+mipersona.getTelefonoPersona()+"')");
+			JOptionPane.showMessageDialog(null, "Se ha registrado exostosamente ", "Informacion", JOptionPane.INFORMATION_MESSAGE);
+			//se libera recursos
+			estatuto.close();
+			con.desconectar();
+			
+		} catch(SQLException e){
+			JOptionPane.showMessageDialog(null,"No se puedo registrar los datos en DB");
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	public PersonaVO buscarPersona(int codigo) {
+		Conexion cone = new Conexion();
+		PersonaVO persona = new PersonaVO();
+		boolean existe = false;
+		try {
+			String query = "SELECT * FROM persona WHERE id = ?"; //consulta
+			//el objeto preparadStatement nos permite ejecutar consultas con los signos de pregunta "?" 
+			PreparedStatement consulta = cone.getConnection().prepareStatement(query); 
+			//se reemplaza los signos de pregunta por los valores que corresponda
+			consulta.setInt(1, codigo);
+			//ejecutar consulta
+			ResultSet res = consulta.executeQuery();
+			
+			if(res.next()) {
+				existe = true;
+				persona.setIdPersona(res.getInt("id"));//se recupera el valor del campo
+				persona.setNombrePersona(res.getString("nombre"));
+				persona.setEdadPersona(res.getInt("edad"));
+				persona.setProfesionPersona(res.getString("profesion"));
+				persona.setTelefonoPersona(res.getInt("telefono"));
+			}
+			
+			res.close();
+			cone.desconectar();
+			
+			
+		}catch(SQLException e) {
+			JOptionPane.showMessageDialog(null, "Error no se logro buscar a la persona con ID"+codigo);
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			System.out.println(e);
+		}
+		if(existe) {
+			return persona;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public void modificarPersona(PersonaVO miPersonaVO) {
+		Conexion conex = new Conexion();
+		if(buscarPersona(miPersonaVO.getIdPersona()) != null) {
+		
+			try {
+				String consulta = "UPDATE persona SET nombre = ?, edad = ?, profesion = ?, telefono = ? WHERE id = ?";
+				PreparedStatement estatuto = conex.getConnection().prepareStatement(consulta);
+				estatuto.setString(1, miPersonaVO.getNombrePersona());
+				estatuto.setInt(2, miPersonaVO.getEdadPersona());
+				estatuto.setString(3, miPersonaVO.getProfesionPersona());
+				estatuto.setInt(4, miPersonaVO.getTelefonoPersona());
+				estatuto.setInt(5, miPersonaVO.getIdPersona());
+				estatuto.executeUpdate();
+			}
+			catch(SQLException e){
+				JOptionPane.showMessageDialog(null, "La persona con ese ID no se puedo actualizar");
+				System.out.println(e);
+				e.printStackTrace();
+			}
+		}
+		else {
+			JOptionPane.showMessageDialog(null,"La persona con id"+ miPersonaVO.getIdPersona() + "no existe y no se pudo actualizar");
+		}
+	}
+	/*
+	public static void main(String[] args) {
+		PersonaDAO midao = new PersonaDAO();
+		PersonaVO mivo = midao.buscarPersona(2);
+
+		if(mivo != null) {
+			System.out.println("La persona existe y es la siguiente");
+			System.out.println(mivo.toString());
+		}
+		else {
+			System.out.println("La persona no existe");
+		}
+	}
+	*/
+}
